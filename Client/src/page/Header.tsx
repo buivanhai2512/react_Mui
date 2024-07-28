@@ -13,35 +13,65 @@ import {
   Grid,
   Avatar,
   Button,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  CircularProgress,
 } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import logo from "src/assets/logo_MUI-removebg.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logout } from "../services/Auth/Auth";
+import useProductsQuery from "../hook/UseProductsQuery";
+import { IdProducts } from "@/interfaces/Products";
+
 const Header = () => {
   const handleLogout = () => {
     logout();
   };
+
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState<IdProducts[]>([]);
+  const { data: products, isLoading } = useProductsQuery();
+
+  useEffect(() => {
+    if (products) {
+      setFilteredProducts(
+        products.filter((product: IdProducts) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, products]);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <>
-      <AppBar position="static" sx={{
-        backgroundColor: "black"
-      }}>
-        <Container maxWidth="xl" sx={{ padding: "0 !important", }}>
+      <AppBar position="static" sx={{ backgroundColor: "black" }}>
+        <Container maxWidth="xl" sx={{ padding: "0 !important" }}>
           <Toolbar
-            sx={{ height: 90, width: "100%", justifyContent: "space-between", padding: "0 !important", }}
+            sx={{
+              height: 90,
+              width: "100%",
+              justifyContent: "space-between",
+              padding: "0 !important",
+            }}
           >
             <Link href="/">
               <img style={{ width: 110 }} src={logo} alt="" />
@@ -51,9 +81,7 @@ const Header = () => {
                 SoleStyle Footwear
               </Typography>
             </Link>
-            <Box
-              sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
-            >
+            <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
               <Link sx={{ mx: 2 }} color="inherit" href="#">
                 Home
               </Link>
@@ -67,30 +95,83 @@ const Header = () => {
                 Contact
               </Link>
             </Box>
-            <IconButton
-              size="large"
-              edge="end"
-              color="inherit"
-              aria-label="search"
-              sx={{ mr: 2 }}
-            >
+            <Box sx={{ position: "relative" }}>
               <InputBase
                 placeholder="Search…"
                 inputProps={{ "aria-label": "search" }}
-                sx={{ color: "inherit", flexGrow: 1, mr: 6 }}
+                sx={{ color: "inherit", flexGrow: 1, mr: 1 }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <SearchIcon />
-            </IconButton>
+              <IconButton size="large" edge="end" color="inherit" aria-label="search" sx={{ mr: 2 }}>
+                <SearchIcon />
+              </IconButton>
+              {searchTerm && (
+                <Paper sx={{ position: "absolute", top: 50, left: 0, right: 0, zIndex: 10, maxHeight: 300, overflowY: "auto" }}>
+                  {isLoading ? (
+                    <CircularProgress />
+                  ) : (
+                    <List>
+                      {filteredProducts.map((product: IdProducts) => {
+                        // Tính giá sau giảm
+                        const discountPrice = product.discount
+                          ? product.price * (1 - product.discount / 100)
+                          : product.price;
+
+                        return (
+                          <ListItem key={product._id}>
+                            <Link href={`/product/${product._id}`} color="inherit" underline="none" sx={{ display: "flex", alignItems: "center" }}>
+                              <ListItemAvatar>
+                                <Box
+                                  component="img"
+                                  alt={product.name}
+                                  src={product.img}
+                                  sx={{
+                                    width: 35,
+                                    height: 35,
+                                    borderRadius: 1,
+                                    objectFit: 'cover',
+                                  }}
+                                />
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                                    {product.name}
+                                  </Typography>
+                                }
+                                secondary={
+                                  <>
+                                    {product.discount ? (
+                                      <>
+                                        <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'gray' }}>
+                                          Giá: {product.price.toFixed(0)} VND
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'red' }}>
+                                          Giảm giá: {discountPrice.toFixed(0)} VND
+                                        </Typography>
+                                      </>
+                                    ) : (
+                                      <Typography variant="body2" sx={{ color: 'black' }}>
+                                        Giá: {product.price.toFixed(0)} VND
+                                      </Typography>
+                                    )}
+                                  </>
+                                }
+                              />
+                            </Link>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  )}
+                </Paper>
+              )}
+            </Box>
             <Badge badgeContent={4} sx={{ mr: 4 }} color="error">
               <MailIcon color="inherit" />
             </Badge>
-            <IconButton
-              size="large"
-              edge="end"
-              color="inherit"
-              aria-label="notifications"
-              sx={{ mr: 2 }}
-            >
+            <IconButton size="large" edge="end" color="inherit" aria-label="notifications" sx={{ mr: 2 }}>
               <NotificationsIcon />
             </IconButton>
             {user ? (
@@ -139,7 +220,6 @@ const Header = () => {
                     </Grid>
                     <Grid item xs={12} textAlign="center">
                       <Link href="/signin" color="inherit" underline="none">
-
                         <Button
                           type="submit"
                           variant="contained"
@@ -183,7 +263,7 @@ const Header = () => {
                   </MenuItem>
                   <MenuItem onClick={handleClose}>
                     <Link href="/signup" color="inherit" underline="none">
-                      Register
+                      Signup
                     </Link>
                   </MenuItem>
                 </Menu>
@@ -197,6 +277,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-// xin chào

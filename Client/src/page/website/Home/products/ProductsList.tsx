@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { IdProducts } from "@/interfaces/Products";
 import { formatCurrencyVND } from "../../../../services/VND/Vnd";
 import NotFound from "../NotFound/NotFound";
-import useProductsQuery from "../../../../hook/UseProductsQuerry";
+import useProductsQuery from "../../../../hook/UseProductsQuery";
 const ProductList = () => {
   const { data, isLoading } = useProductsQuery();
   if (!data) return <NotFound />;
@@ -123,15 +123,15 @@ const ProductList = () => {
                   mt={1}
                 >
                   <Typography variant="h6" color={"#525252"}
-                   sx={{ textDecoration: 'line-through' }} 
-                  fontWeight={600}>
+                    sx={{ textDecoration: 'line-through' }}
+                    fontWeight={600}>
                     {formatCurrencyVND(product.price)}
                   </Typography>
                   <Typography variant="h6" color={"red"} fontWeight={600}>
                     {product.discount > 0
                       ? formatCurrencyVND(
-                          product.price * (1 - product.discount / 100)
-                        )
+                        product.price * (1 - product.discount / 100)
+                      )
                       : formatCurrencyVND(product.price)}
                   </Typography>
                 </Box>

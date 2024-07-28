@@ -16,7 +16,7 @@ import { styled } from "@mui/system";
 import { useParams } from "react-router-dom";
 import ImgProductDetail from "./ImgProductDetail";
 import StarIcon from "@mui/icons-material/Star";
-import useProductsQuery from "../../../../hook/UseProductsQuerry";
+import useProductsQuery from "../../../../hook/UseProductsQuery";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import NotFound from "../NotFound/NotFound";
 import { Add, Remove } from "@mui/icons-material";
@@ -147,7 +147,7 @@ const ProductDetail = () => {
           </Grid>
         </Grid>
         <Box>
-          <Typography
+          <Typography sx={{}}
             variant="h4"
             fontFamily="Poppins"
             fontWeight={400}

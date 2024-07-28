@@ -13,7 +13,7 @@ import UseCategory from "../../../hook/UseCategory";
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { CategoryFace } from "@/interfaces/Category";
 import { FormProductAdd } from "@/interfaces/formdata";
-import useProductsQuery from "../../../hook/UseProductsQuerry";
+import useProductsQuery from "../../../hook/UseProductsQuery";
 import { useEffect } from "react";
 
 const ProductEdit = () => {
