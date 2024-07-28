@@ -48,26 +48,28 @@ const ProductEdit = () => {
 
   useEffect(() => {
     if (!isLoading && data) {
-      const ProductByid = {
+      const productById = {
         ...data,
         category: data.category,
       };
-      reset(ProductByid);
+      reset(productById);
     }
   }, [data, isLoading, reset]);
+
   const onSubmit = async (formData: FormProductAdd) => {
     try {
-      const image = await uploadFile(formData.img[0]);
-      const imgCategoryUrls = await Promise.all(
-        Array.from(formData.imgCategory).map(uploadFile)
-      );
+      // Xử lý ảnh sản phẩm chính
+      const imageUrl = formData.img[0] ? await uploadFile(formData.img[0]) : data.img;
+
+      // Xử lý ảnh danh mục
+      const imgCategoryUrls = formData.imgCategory.length
+        ? await Promise.all(Array.from(formData.imgCategory).map(uploadFile))
+        : data.imgCategory;
 
       await mutate({
         ...formData,
-        img: image || data.img,
-        imgCategory: imgCategoryUrls.length
-          ? imgCategoryUrls
-          : data.imgCategory,
+        img: imageUrl,
+        imgCategory: imgCategoryUrls,
       });
       setTimeout(() => {
         navigate("/admin");

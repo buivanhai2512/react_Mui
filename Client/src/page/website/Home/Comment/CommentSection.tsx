@@ -11,7 +11,7 @@ interface Comment {
     author: string;
 }
 
-const labels: { [index: string]: string } = {
+const labels: { [index: number]: string } = {
     0.5: "Useless",
     1: "Useless+",
     1.5: "Poor",
@@ -24,8 +24,7 @@ const labels: { [index: string]: string } = {
     5: "Excellent+",
 };
 
-
-const CommentSection = () => {
+const CommentSection: React.FC = () => {
     const { user } = useAuth();
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
@@ -35,7 +34,7 @@ const CommentSection = () => {
         setNewComment(event.target.value);
     };
 
-    const handleRatingChange = (event: React.ChangeEvent<{}>, newValue: number | null) => {
+    const handleRatingChange = (event: React.SyntheticEvent<Element, Event>, newValue: number | null) => {
         setNewRating(newValue);
     };
 
@@ -108,7 +107,6 @@ const CommentSection = () => {
                                     <Typography sx={{ mt: 2, fontSize: 20 }}>
                                         {format(comment.timestamp, 'dd/MM/yyyy HH:mm')}
                                     </Typography>
-
                                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                         <Rating
                                             value={comment.rating}

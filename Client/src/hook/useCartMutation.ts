@@ -1,28 +1,28 @@
 import { useMutation, useQueryClient } from "react-query";
-import { IdProducts } from "../interfaces/Products";
-import { addProduct, deleteProduct, updateProduct } from "../services/Products";
 import { toast } from "react-toastify";
+import { addCart, removeProduct } from "../services/cart/Cart";
+import { CartOrder } from "../interfaces/Cart";
 
-type useProductMutationProps = {
+type UseCartMutation = {
   action: "CREATE" | "UPDATE" | "DELETE";
 };
-const useProductMutation = ({ action }: useProductMutationProps) => {
+const useCartMutation = ({ action }: UseCartMutation) => {
   const queryClient = useQueryClient();
   const { mutate, ...rest } = useMutation({
-    mutationFn: async (product: IdProducts) => {
+    mutationFn: async (Cart: CartOrder) => {
       switch (action) {
         case "CREATE":
-          await addProduct(product);
-          toast.success("Thêm sản phẩm thành công");
+          await addCart(Cart);
+          toast.success("Thêm sản phẩm vào giỏ hàng thành công !!" )
           break;
         case "UPDATE":
-          await updateProduct(product);
+          // await updateProduct(product);
           toast.success("Cập nhật sản phẩm thành công");
           break;
         case "DELETE":
           if (window.confirm("Bạn muốn xóa sản phẩm không ")) {
-            await deleteProduct(product._id!);
-            toast.success("Xóa sản phẩm thành công !!")
+            await removeProduct(Cart.userId, Cart.productId);
+            toast.success("Xóa sản phẩm thành công");
           }
           break;
         default:
@@ -31,10 +31,10 @@ const useProductMutation = ({ action }: useProductMutationProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["PRODUCT_KEY"],
+        queryKey: ["CART_ORDER"],
       });
     },
   });
   return { mutate, ...rest };
 };
-export default useProductMutation;
+export default useCartMutation;
